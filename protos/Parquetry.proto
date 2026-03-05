@@ -1,0 +1,70 @@
+#VRML_SIM R2025a utf8
+# license: Apache License 2.0
+# license url: https://www.apache.org/licenses/LICENSE-2.0
+# documentation url: https://webots.cloud/run?url=https://github.com/cyberbotics/webots/blob/released/projects/appearances/protos/Parquetry.proto
+# keywords: appearance/wood
+# template language: javascript
+
+PROTO Parquetry [
+  field SFString{"chequered", "dark strip", "light strip", "mosaic", "my_map"}
+                 type             "mosaic"
+  field SFColor  colorOverride    1 1 1
+  field SFNode   textureTransform NULL
+  field SFFloat  IBLStrength      1
+]
+{
+  %<
+    const typeValue = fields.type.value;
+    const textureName = typeValue.replace(/\s+/g, '_');
+    const isCustom = (typeValue === "my_map");
+  >%
+  PBRAppearance {
+    baseColor IS colorOverride
+
+    baseColorMap ImageTexture {
+      url [
+        %<
+          if (isCustom) {
+        >%
+            "textures/my_floor_texture_2.png"
+        %<
+          } else {
+        >%
+            %<= '"https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/parquetry/' + textureName + '_parquetry_base_color.jpg"' >%
+        %<
+          }
+        >%
+      ]
+    }
+
+    roughness 1
+    metalness 0
+    IBLStrength IS IBLStrength
+    textureTransform IS textureTransform
+
+    %< if (!isCustom && typeValue !== "dark strip") { >%
+    roughnessMap ImageTexture {
+      url [
+        %<= '"https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/parquetry/' + textureName + '_parquetry_roughness.jpg"' >%
+      ]
+    }
+    %< } >%
+
+    %< if (!isCustom) { >%
+    normalMap ImageTexture {
+      url [
+        %<= '"https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/parquetry/' + textureName + '_parquetry_normal.jpg"' >%
+      ]
+    }
+    normalMapFactor 1
+    %< } >%
+
+    %< if (!isCustom && typeValue !== "light strip") { >%
+    occlusionMap ImageTexture {
+      url [
+        %<= '"https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/textures/parquetry/' + textureName + '_parquetry_occlusion.jpg"' >%
+      ]
+    }
+    %< } >%
+  }
+}
